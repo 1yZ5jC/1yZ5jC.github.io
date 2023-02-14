@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<head>
+  <base href="/toy/qrcode/" />
+  <script
+    :name="QRCode"
+    :description="Generate QRCode."
+    :version="0.1.5"
+    src="../veps.js"
+  ></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+</head>
+
+<style>
+  svg {
+    width: 80vmin;
+    max-width: 300px;
+    height: 80vmin;
+    max-height: 300px;
+  }
+  body > * {
+    display: block;
+    width: 80vmin;
+    max-width: 300px;
+    margin: 10px auto 0;
+  }
+  div ~ * {
+    padding: 4px 8px;
+    border: 1px solid #888;
+  }
+</style>
+
+<body>
+  <div id="$o"></div>
+  <select id="$level">
+    <option value="L" selected>7%</option>
+    <option value="M">15%</option>
+    <option value="Q">25%</option>
+    <option value="H">30%</option>
+  </select>
+  <input id="$i" placeholder="Input content here" />
+</body>
+
+<script>
+  $i.value = location.origin;
+  $level.onchange = $i.oninput = () => {
+    const qr = qrcode(0, $level.value);
+    qr.addData($i.value);
+    qr.make();
+    $o.innerHTML = qr.createSvgTag(1, 1); // (block, margin)
+  };
+  $i.oninput();
+</script>

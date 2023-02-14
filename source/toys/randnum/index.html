@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<head>
+  <base href="/toy/randnum/" />
+  <script
+    :name="Random Number"
+    :description="Random number generator."
+    :version="0.1.5"
+    src="../veps.js"
+  ></script>
+</head>
+
+<style>
+  body > *{
+    display: block;
+    width: 80vmin;
+    max-width: 300px;
+    padding: 4px 8px;
+    margin: 10px auto 0;
+    border: 1px solid #777;
+  }
+  label > :not(span) {
+    float: right;
+    width: 70px;
+    border: 1px solid #777;
+  }
+  th,
+  td {
+    padding: 4px 8px;
+  }
+</style>
+
+<body>
+  <label>Minimum<input id="$min" value="1" type="number" /></label>
+  <label>Maximum<input id="$max" value="50" type="number" /></label>
+  <label>Count<input id="$count" value="1" type="number" /></label>
+  <button onclick="$out.innerHTML = ''">Clear</button>
+  <button id="$gen">Generate</button>
+  <table>
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody id="$out"></tbody>
+  </table>
+</body>
+
+<script>
+  const rand = (min, max) => Math.round(Math.random() * (max - min)) + min;
+  const getTime = () => {
+    const date = new Date();
+    return `${date.toTimeString().slice(0, 8)}`;
+  };
+  $gen.addEventListener("click", () => {
+    const time = getTime();
+    const min = Number($min.value);
+    const max = Number($max.value);
+    let count = Number($count.value);
+    let insert = "";
+    while (count--)
+      insert += `<tr><td>${time}</td><td>${rand(min, max)}</td></tr>`;
+    $out.insertAdjacentHTML("beforeend", insert);
+    requestIdleCallback(() => $out.lastElementChild.scrollIntoView());
+  });
+</script>
