@@ -1,14 +1,14 @@
 {
   "daily": [
     {
-      "folder": "Hello_World",
+      "folder": "hello-world",
       "title": "Hello World",
       "date": "2026-08-30"
     }
   ],
   "articles": [
     {
-      "folder": "ThinkPad Carbon 1st Gen——未来是你们的",
+      "folder": "thinkpad-x1-carbon-1st",
       "title": "ThinkPad Carbon 1st Gen——未来是你们的",
       "date": "2026-08-30"
     }
