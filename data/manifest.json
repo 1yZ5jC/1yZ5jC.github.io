@@ -1,12 +1,14 @@
 {
-    "daily": [
-        {  },
-        { "folder": "Hello_World", "title": "Hello World" }
-    ],
-    "articles": [
-        { "folder": "ThinkPad Carbon 1st Gen——未来是你们的", "title": "ThinkPad Carbon 1st Gen——未来是你们的" }
-    ],
-    "anime": [
-        { "folder": "新世纪福音战士", "title": "新世纪福音战士简评" }
-    ]
+  "daily": [
+    {
+      "folder": "Hello_World",
+      "title": "Hello_World"
+    }
+  ],
+  "articles": [
+    {
+      "folder": "ThinkPad Carbon 1st Gen——未来是你们的",
+      "title": "ThinkPad Carbon 1st Gen——未来是你们的"
+    }
+  ]
 }
