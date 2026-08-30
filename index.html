@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alan Plex的小站 · 日常/文章/动漫</title>
+    <!-- 引入 marked.js 用于解析 Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>📖 Alan Plex的小站</h1>
+        <nav>
+            <button class="nav-btn active" data-category="daily">📝 日常</button>
+            <button class="nav-btn" data-category="articles">✍️ 文章</button>
+            <button class="nav-btn" data-category="anime">🎬 动漫评价</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- 左侧：文章列表 -->
+        <aside id="sidebar">
+            <ul id="post-list"></ul>
+        </aside>
+        <!-- 右侧：文章正文 -->
+        <section id="content">
+            <div id="markdown-body"></div>
+        </section>
+    </main>
+
+    <footer>
+        <span>🌓 <button id="theme-toggle">切换暗色</button></span>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
