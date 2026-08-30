@@ -28,6 +28,12 @@ function hasMarkdownTitle(mdText) {
     return false;
 }
 
+function stripFrontMatter(mdText) {
+    // 移除开头的 YAML Front Matter (--- ... ---)
+    const frontMatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n/;
+    return mdText.replace(frontMatterRegex, '');
+}
+
 // ---------- 加载 manifest ----------
 async function loadManifest() {
     try {
@@ -94,14 +100,17 @@ async function loadMarkdown(category, folder) {
     try {
         const response = await fetch(mdPath);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const mdText = await response.text();
+        let mdText = await response.text();
+
+        // 移除 Front Matter
+        const cleanMd = stripFrontMatter(mdText);
 
         const postMeta = manifest[category]?.find(p => p.folder === folder);
         const title = postMeta?.title || folder;
         const date = postMeta?.date || '';
 
-        const hasTitle = hasMarkdownTitle(mdText);
-        let html = marked.parse(mdText, MARKED_OPTIONS);
+        const hasTitle = hasMarkdownTitle(cleanMd);
+        let html = marked.parse(cleanMd, MARKED_OPTIONS);
 
         let headerHtml = '';
         if (!hasTitle) {
@@ -141,18 +150,18 @@ async function loadAllAnime() {
         try {
             const response = await fetch(mdPath);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const mdText = await response.text();
+            let mdText = await response.text();
 
-            // 移除正文中的第一个 # 标题（如果有），因为我们将统一使用 manifest 标题
-            let processedMd = mdText;
-            const hasTitle = hasMarkdownTitle(mdText);
-            if (hasTitle) {
-                processedMd = mdText.replace(/^#\s+.*\n?/, '');
+            // 移除 Front Matter
+            let cleanMd = stripFrontMatter(mdText);
+
+            // 移除正文中的第一个 # 标题（统一使用 manifest 标题）
+            if (hasMarkdownTitle(cleanMd)) {
+                cleanMd = cleanMd.replace(/^#\s+.*\n?/, '');
             }
 
-            let html = marked.parse(processedMd, MARKED_OPTIONS);
+            let html = marked.parse(cleanMd, MARKED_OPTIONS);
 
-            // 标题+日期
             const headerHtml = `
                 <div class="anime-post-header">
                     <h2 class="anime-title">🎬 ${p.title}</h2>
@@ -160,7 +169,6 @@ async function loadAllAnime() {
                 </div>
             `;
 
-            // 图片处理
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = html;
             const imgs = tempDiv.querySelectorAll('img');
