@@ -1,32 +1,45 @@
 // ---------- 全局配置 ----------
-const MARKED_OPTIONS = {
-    gfm: true,
-    breaks: true,
-};
+const MARKED_OPTIONS = { gfm: true, breaks: true };
 
-// ---------- 状态管理 ----------
+// ---------- 状态 ----------
 let manifest = {};
 let currentCategory = 'daily';
-let currentFolder = null; // 当前选中的文章文件夹（仅用于非动漫板块）
+let currentFolder = null;
 
 const postListEl = document.getElementById('post-list');
 const markdownBody = document.getElementById('markdown-body');
 const navBtns = document.querySelectorAll('.nav-btn');
 const themeToggle = document.getElementById('theme-toggle');
 
-// ---------- 加载文章清单 ----------
+// ---------- 辅助函数 ----------
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length === 3) return `${parts[0]}年${parseInt(parts[1])}月${parseInt(parts[2])}日`;
+    return dateStr;
+}
+
+function hasMarkdownTitle(mdText) {
+    const lines = mdText.split('\n');
+    for (let line of lines) {
+        if (line.trim() === '') continue;
+        return /^#\s+/.test(line.trim());
+    }
+    return false;
+}
+
+// ---------- 加载 manifest ----------
 async function loadManifest() {
     try {
         const response = await fetch('data/manifest.json');
         if (!response.ok) throw new Error('manifest.json 加载失败');
         manifest = await response.json();
-        // 确保每个分类存在
         ['daily', 'articles', 'anime'].forEach(cat => {
             if (!manifest[cat]) manifest[cat] = [];
         });
         console.log('📋 Manifest 加载成功', manifest);
     } catch (err) {
-        console.warn('⚠️ 未找到 manifest.json，使用空列表', err);
+        console.warn('⚠️ 未找到 manifest.json', err);
         manifest = { daily: [], articles: [], anime: [] };
     }
 }
@@ -34,36 +47,30 @@ async function loadManifest() {
 // ---------- 渲染侧边栏 ----------
 function renderSidebar(category) {
     const posts = manifest[category] || [];
-    // 生成列表 HTML
-    postListEl.innerHTML = posts.map(p => 
+    postListEl.innerHTML = posts.map(p =>
         `<li data-folder="${p.folder}" class="${p.folder === currentFolder ? 'active-post' : ''}">${p.title}</li>`
     ).join('');
 
-    // 绑定点击事件
     postListEl.querySelectorAll('li').forEach(li => {
         li.addEventListener('click', () => {
             const folder = li.dataset.folder;
             if (category === 'anime') {
-                // 动漫板块：只高亮，不重新加载（内容已全部展示）
                 document.querySelectorAll('#post-list li').forEach(l => l.classList.remove('active-post'));
                 li.classList.add('active-post');
-                currentFolder = folder; // 记录高亮，但内容不变
+                currentFolder = folder;
                 return;
             } else {
-                // 其他板块：正常加载单篇文章
                 loadMarkdown(category, folder);
             }
         });
     });
 
-    // 特殊处理：动漫板块直接显示全部简评
     if (category === 'anime') {
         loadAllAnime();
-        currentFolder = null; // 重置选中（因为不需要单篇高亮）
+        currentFolder = null;
         return;
     }
 
-    // 非动漫板块：自动加载第一篇
     if (posts.length > 0 && !currentFolder) {
         loadMarkdown(category, posts[0].folder);
     } else if (posts.length === 0) {
@@ -71,17 +78,12 @@ function renderSidebar(category) {
     }
 }
 
-// ---------- 加载并渲染单篇 Markdown ----------
+// ---------- 加载单篇 ----------
 async function loadMarkdown(category, folder) {
     currentCategory = category;
     currentFolder = folder;
 
-    // 更新导航按钮激活态
-    navBtns.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.category === category);
-    });
-
-    // 更新侧边栏高亮
+    navBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.category === category));
     document.querySelectorAll('#post-list li').forEach(li => {
         li.classList.toggle('active-post', li.dataset.folder === folder);
     });
@@ -93,15 +95,28 @@ async function loadMarkdown(category, folder) {
         const response = await fetch(mdPath);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const mdText = await response.text();
-        let html = marked.parse(mdText, MARKED_OPTIONS);
-        markdownBody.innerHTML = html;
 
-        // 修正图片路径（相对路径补全）
+        const postMeta = manifest[category]?.find(p => p.folder === folder);
+        const title = postMeta?.title || folder;
+        const date = postMeta?.date || '';
+
+        const hasTitle = hasMarkdownTitle(mdText);
+        let html = marked.parse(mdText, MARKED_OPTIONS);
+
+        let headerHtml = '';
+        if (!hasTitle) {
+            headerHtml += `<h1 class="post-title">${title}</h1>`;
+        }
+        if (date) {
+            headerHtml += `<p class="post-date">📅 ${formatDate(date)}</p>`;
+        }
+
+        markdownBody.innerHTML = headerHtml + html;
+
         const images = markdownBody.querySelectorAll('img');
         images.forEach(img => {
             let src = img.getAttribute('src');
-            if (!src) return;
-            if (!/^https?:\/\//i.test(src) && !src.startsWith('/')) {
+            if (src && !/^https?:\/\//i.test(src) && !src.startsWith('/')) {
                 img.src = basePath + src;
             }
         });
@@ -110,7 +125,7 @@ async function loadMarkdown(category, folder) {
     }
 }
 
-// ---------- 加载所有动漫简评（一次性全部展示） ----------
+// ---------- 加载全部动漫 ----------
 async function loadAllAnime() {
     const posts = manifest['anime'] || [];
     if (posts.length === 0) {
@@ -127,8 +142,25 @@ async function loadAllAnime() {
             const response = await fetch(mdPath);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const mdText = await response.text();
-            let html = marked.parse(mdText, MARKED_OPTIONS);
-            // 处理图片路径
+
+            // 移除正文中的第一个 # 标题（如果有），因为我们将统一使用 manifest 标题
+            let processedMd = mdText;
+            const hasTitle = hasMarkdownTitle(mdText);
+            if (hasTitle) {
+                processedMd = mdText.replace(/^#\s+.*\n?/, '');
+            }
+
+            let html = marked.parse(processedMd, MARKED_OPTIONS);
+
+            // 标题+日期
+            const headerHtml = `
+                <div class="anime-post-header">
+                    <h2 class="anime-title">🎬 ${p.title}</h2>
+                    ${p.date ? `<p class="post-date">📅 ${formatDate(p.date)}</p>` : ''}
+                </div>
+            `;
+
+            // 图片处理
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = html;
             const imgs = tempDiv.querySelectorAll('img');
@@ -138,9 +170,14 @@ async function loadAllAnime() {
                     img.src = basePath + src;
                 }
             });
-            // 添加文章标题（作为分隔）
-            const titleHtml = `<h2 class="anime-title">🎬 ${p.title}</h2>`;
-            htmlContent += `<div class="anime-post">${titleHtml}${tempDiv.innerHTML}</div><hr class="anime-divider">`;
+
+            htmlContent += `
+                <div class="anime-post">
+                    ${headerHtml}
+                    ${tempDiv.innerHTML}
+                </div>
+                <hr class="anime-divider">
+            `;
         } catch (err) {
             htmlContent += `<p style="color: #dc2626;">⚠️ 加载“${p.title}”失败：${err.message}</p>`;
         }
@@ -148,17 +185,17 @@ async function loadAllAnime() {
     markdownBody.innerHTML = htmlContent;
 }
 
-// ---------- 导航切换事件 ----------
+// ---------- 导航切换 ----------
 navBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         const category = btn.dataset.category;
         currentCategory = category;
-        currentFolder = null; // 重置，让新板块自动加载第一篇
+        currentFolder = null;
         renderSidebar(category);
     });
 });
 
-// ---------- 明暗主题切换 ----------
+// ---------- 明暗主题 ----------
 let darkMode = false;
 themeToggle.addEventListener('click', () => {
     darkMode = !darkMode;
@@ -169,7 +206,7 @@ themeToggle.addEventListener('click', () => {
 // ---------- 初始化 ----------
 async function init() {
     await loadManifest();
-    renderSidebar('daily'); // 默认显示日常
+    renderSidebar('daily');
 }
 
 init();
