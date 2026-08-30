@@ -2,13 +2,16 @@
   "daily": [
     {
       "folder": "Hello_World",
-      "title": "Hello_World"
+      "title": "Hello World",
+      "date": "2026-08-30"
     }
   ],
   "articles": [
     {
       "folder": "ThinkPad Carbon 1st Gen——未来是你们的",
-      "title": "ThinkPad Carbon 1st Gen——未来是你们的"
+      "title": "ThinkPad Carbon 1st Gen——未来是你们的",
+      "date": "2026-08-30"
     }
-  ]
+  ],
+  "anime": []
 }
