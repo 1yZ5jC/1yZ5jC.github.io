@@ -1,10 +1,10 @@
-\---
+---
 
 title: Yoga Slim 7 14Q8X9工程机摸机小记
 
 date: 2026-08-30
 
-\---
+---
 
 ![](images/image1.jpg)
 
