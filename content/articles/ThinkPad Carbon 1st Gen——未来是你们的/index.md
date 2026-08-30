@@ -1,3 +1,7 @@
+---
+title: ThinkPad Carbon 1st Gen——未来是你们的
+date: 2026-08-30
+---
 ![](images/image1.jpg)
 
 **ThinkPad Carbon 1st Gen——未来是你们的**
