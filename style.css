@@ -135,3 +135,24 @@ footer {
     border-top: 1px dashed var(--border);
     margin: 1.5rem 0;
 }
+.search-box {
+    padding: 0.5rem 0;
+    margin-bottom: 0.5rem;
+}
+#search-input {
+    width: 100%;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border 0.2s;
+}
+#search-input:focus {
+    border-color: #2563eb;
+}
+#search-input::placeholder {
+    color: #999;
+}

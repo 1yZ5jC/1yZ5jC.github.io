@@ -21,8 +21,11 @@
     <main>
         <!-- 左侧：文章列表 -->
         <aside id="sidebar">
-            <ul id="post-list"></ul>
-        </aside>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="🔍 搜索标题或标签..." />
+            </div>
+        <ul id="post-list"></ul>
+    </aside>
         <!-- 右侧：文章正文 -->
         <section id="content">
             <div id="markdown-body"></div>
