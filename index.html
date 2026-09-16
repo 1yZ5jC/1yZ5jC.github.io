@@ -21,11 +21,19 @@
     <main>
         <!-- 左侧：文章列表 -->
         <aside id="sidebar">
-            <div class="search-box">
-                <input type="text" id="search-input" placeholder="🔍 搜索标题或标签..." />
-            </div>
-        <ul id="post-list"></ul>
-    </aside>
+    <div class="filter-panel">
+        <input type="text" id="search-input" placeholder="🔍 搜索标题或标签..." />
+        <div class="date-filter">
+            <label>📅 从 <input type="date" id="date-start" /></label>
+            <label>到 <input type="date" id="date-end" /></label>
+        </div>
+        <div class="sort-toggle">
+            <button id="sort-btn" data-order="desc">↓ 最新在前</button>
+        </div>
+    </div>
+    <ul id="post-list"></ul>
+    <div id="pagination" class="pagination"></div>
+</aside>
         <!-- 右侧：文章正文 -->
         <section id="content">
             <div id="markdown-body"></div>

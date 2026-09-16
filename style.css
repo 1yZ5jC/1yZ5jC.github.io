@@ -156,3 +156,102 @@ footer {
 #search-input::placeholder {
     color: #999;
 }
+/* 筛选面板 */
+.filter-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+}
+#search-input {
+    width: 100%;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.85rem;
+    outline: none;
+}
+#search-input:focus { border-color: #2563eb; }
+
+.date-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    color: var(--text);
+}
+.date-filter label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.date-filter input[type="date"] {
+    flex: 1;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.8rem;
+    outline: none;
+}
+
+.sort-toggle button {
+    width: 100%;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: 0.15s;
+}
+.sort-toggle button:hover { background: var(--hover); }
+
+/* 标签样式 */
+.post-tags { margin: 0.5rem 0 1rem; }
+.tag {
+    display: inline-block;
+    background: var(--hover);
+    color: var(--text);
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    margin-right: 0.4rem;
+    font-size: 0.8rem;
+    border: 1px solid var(--border);
+}
+
+/* 分页 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.8rem 0;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+}
+.pagination button {
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: 0.15s;
+}
+.pagination button:hover:not(:disabled) { background: var(--hover); }
+.pagination button.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+.pagination button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
